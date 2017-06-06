@@ -125,7 +125,7 @@ App.prototype.sendNewReply = async(function(message){
             var userId = parseInt(message.getRecipient(), 10);
             var msg = {
                 user_id: userId,
-                random_id: CRC32.str(message.getRecipient() + message.getBody()),
+                random_id: CRC32.str(message.getRecipient() + message.getCreatedAt()),
                 peer_id: userId,
                 message: message.getBody()
             };

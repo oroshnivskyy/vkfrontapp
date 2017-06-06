@@ -68,3 +68,7 @@ Message.prototype.hasAuthor = function () {
 Message.prototype.getBody = function () {
     return this.msg.text;
 };
+
+Message.prototype.getCreatedAt = function () {
+    return this.msg.created_at;
+};
