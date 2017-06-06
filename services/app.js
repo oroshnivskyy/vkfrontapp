@@ -121,7 +121,7 @@ App.prototype.sendMessage = async(function (params) {
 App.prototype.sendNewReply = async(function(message){
     console.log(message.msg);
     try{
-        if(!message.isInbound()){
+        if(message.hasAuthor()){
             var userId = parseInt(message.getRecipient(), 10);
             var msg = {
                 user_id: userId,

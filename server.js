@@ -61,6 +61,10 @@ Message.prototype.isInbound = function () {
     return this.msg.is_inbound;
 };
 
+Message.prototype.hasAuthor = function () {
+    return boothis.msg.author?true:false;
+};
+
 Message.prototype.getBody = function () {
     return this.msg.text;
 };
