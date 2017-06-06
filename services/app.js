@@ -119,6 +119,7 @@ App.prototype.sendMessage = async(function (params) {
 });
 
 App.prototype.sendNewReply = async(function(message){
+    console.log(message.msg);
     try{
         if(!message.isInbound()){
             var userId = parseInt(message.getRecipient(), 10);
@@ -164,9 +165,12 @@ App.prototype.processDialogs = async(function () {
                 })), {persistent: true});
             }
             var messages = await(app.getHistory(d.user_id, dialog.offset));
+            dialog.offset = dialog.offset === 0 ? 1:dialog.offset;
             dialog.offset = dialog.offset + messages.length;
             await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
-            messages.forEach(function (message) {
+            messages
+                .filter(function(m){return m.user_id === m.from_id})
+                .forEach(function (message) {
                 app.ch.publish('messages', app.config.name, new Buffer(JSON.stringify({
                     message: message,
                     dialog_id: dialog._id
