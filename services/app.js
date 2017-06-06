@@ -165,7 +165,6 @@ App.prototype.processDialogs = async(function () {
                 })), {persistent: true});
             }
             var messages = await(app.getHistory(d.user_id, dialog.offset));
-            dialog.offset = dialog.offset === 0 ? 1:dialog.offset;
             dialog.offset = dialog.offset + messages.length;
             await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
             messages
