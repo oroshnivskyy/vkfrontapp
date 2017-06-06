@@ -138,7 +138,7 @@ App.prototype.sendNewReply = async(function(message){
 
 App.prototype.processDialogs = async(function () {
     console.log("Start loading dialogs..");
-    var dialogs = [];await(this.getDialogs(0));
+    var dialogs = await(this.getDialogs(0));
     var app = this;
     dialogs.forEach(function (d) {
         try {
