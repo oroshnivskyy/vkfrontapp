@@ -1,0 +1,26 @@
+{
+  "mongodb": {
+    "url": "mongodb://127.0.0.1:27017/vkfront"
+  },
+  "rabbitmq": {
+    "url": "amqp://frontapp:1111@localhost:5672/frontapp"
+  },
+  "server": {
+    "port": 3000
+  },
+  "apps": [
+    {
+      "requestInterval": 10000,
+      "name": "testApp",
+      "vk": {
+        "api_key": "6c440e58f75886ce858f76d11242cc7c0648aa3bbda9794fb17f6f900a7e724ee31377188908341cd6bb3",
+        "lang": "en"
+      },
+      "frontapp": {
+        "inbox": "inb_229k",
+        "channel": "cha_1ykk",
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZXMiOlsiKiJdLCJpc3MiOiJmcm9udCIsInN1YiI6InZrZnJvbnRhcHAifQ.pls2bdJowYxabZvA0tuMdtC0hR1xTtmxcs5ld73MGUg"
+      }
+    }
+  ]
+}
