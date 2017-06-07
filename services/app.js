@@ -118,10 +118,10 @@ App.prototype.sendMessage = async(function (params) {
     });
 });
 
-App.prototype.sendNewReply = async(function(message){
+App.prototype.sendNewReply = async(function (message) {
     console.log(message.msg);
-    try{
-        if(message.hasAuthor()){
+    try {
+        if (message.hasAuthor()) {
             var userId = parseInt(message.getRecipient(), 10);
             var msg = {
                 user_id: userId,
@@ -131,14 +131,14 @@ App.prototype.sendNewReply = async(function(message){
             };
             return await(this.sendMessage(msg))
         }
-    } catch (e){
+    } catch (e) {
         console.error(e);
     }
 
 });
 
 App.prototype.processDialogs = async(function () {
-    console.log("Start loading dialogs..");
+    console.log("Start loading dialogs for " + this.config.name + "..");
     var dialogs = await(this.getDialogs(0));
     var app = this;
     dialogs.forEach(function (d) {
@@ -168,19 +168,21 @@ App.prototype.processDialogs = async(function () {
             dialog.offset = dialog.offset + messages.length;
             await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
             messages
-                .filter(function(m){return m.user_id === m.from_id})
+                .filter(function (m) {
+                    return m.user_id === m.from_id
+                })
                 .forEach(function (message) {
-                app.ch.publish('messages', app.config.name, new Buffer(JSON.stringify({
-                    message: message,
-                    dialog_id: dialog._id
-                })))
-            });
+                    app.ch.publish('messages', app.config.name, new Buffer(JSON.stringify({
+                        message: message,
+                        dialog_id: dialog._id
+                    })))
+                });
 
         } catch (e) {
             console.log(e);
         }
     });
-    console.log("Finish loading dialogs..");
+    console.log("Finish loading dialogs " + this.config.name + "..");
     return true;
 });
 
