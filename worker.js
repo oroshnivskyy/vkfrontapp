@@ -98,7 +98,8 @@ var sendMessage = async(function (message, dialogsDb) {
     var data = {
         sender: {handle: "" + dialog.userId, name: dialog.user.first_name + ' ' + dialog.user.last_name},
         subject: message.message.title,
-        body: message.message.body
+        body: message.message.body,
+        options: {archive: false}
     };
     var path = '/channels/' + channelId + '/incoming_messages';
     if (dialog.frontapp.conversation_reference.length > 0) {
