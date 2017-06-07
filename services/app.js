@@ -186,9 +186,7 @@ App.prototype.processDialogs = async(function () {
 
 App.prototype.run = function () {
     var app = this;
-    interval(function () {
-        app.processDialogs();
-    }, app.config.requestInterval);
+    interval(app.processDialogs.bind(this), app.config.requestInterval);
 };
 
 module.exports = App;

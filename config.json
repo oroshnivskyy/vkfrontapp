@@ -10,7 +10,7 @@
   },
   "apps": [
     {
-      "requestInterval": 10000,
+      "requestInterval": 1000,
       "name": "testApp",
       "vk": {
         "api_key": "6c440e58f75886ce858f76d11242cc7c0648aa3bbda9794fb17f6f900a7e724ee31377188908341cd6bb3",

@@ -5,13 +5,21 @@ function interval(func, wait, times) {
         return function () {
             if (typeof t === "undefined" || t-- > 0) {
                 try {
-                    func.call(null);
+                    var res = func.call(null);
+                    if (typeof res.then === 'function') {
+                        res.then(function () {
+                            setTimeout(interv, w);
+                        }).catch(function () {
+                            setTimeout(interv, w);
+                        })
+                    } else {
+                        setTimeout(interv, w);
+                    }
                 }
                 catch (e) {
                     t = 0;
-                    throw e.toString();
-                }finally {
                     setTimeout(interv, w);
+                    throw e.toString();
                 }
             }
         };
