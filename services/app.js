@@ -145,7 +145,12 @@ App.prototype.processDialogs = async(function () {
         try {
             var dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
             if (!dialog) {
-                var user = await(app.getUser(d.user_id));
+                var user = {first_name:d.user_id, last_name: ""};
+                try{
+                    user = await(app.getUser(d.user_id));
+                }catch(e){
+                    console.error(e);
+                }
                 var newDialog = {
                     userId: d.user_id,
                     user: {first_name: user.first_name, last_name: user.last_name},
