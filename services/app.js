@@ -31,10 +31,10 @@ App.prototype.getClient = function () {
     return this.vk;
 };
 
-App.prototype.getDialogs = async(function (offset) {
+App.prototype.getDialogs = async(function (limit, offset) {
     var params = {
-        count: 10,
-        unread: 1,
+        count: limit,
+        unanswered: 1,
         offset: offset
     };
     var app = this;
@@ -46,9 +46,9 @@ App.prototype.getDialogs = async(function (offset) {
             }
             var messages = [];
             o.response.items.forEach(function (m) {
-                if (m.unread > 0) {
+                // if (m.unread > 0) {
                     messages.push(m.message)
-                }
+                // }
             });
             resolve(messages);
         });
@@ -139,56 +139,70 @@ App.prototype.sendNewReply = async(function (message) {
 
 App.prototype.processDialogs = async(function () {
     console.log("Start loading dialogs for " + this.config.name + "..");
-    var dialogs = await(this.getDialogs(0));
+    var limit = 10;
     var app = this;
-    dialogs.forEach(function (d) {
-        try {
-            var dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
-            if (!dialog) {
-                var user = {first_name:d.user_id, last_name: ""};
-                try{
-                    user = await(app.getUser(d.user_id));
-                }catch(e){
-                    console.error(e);
-                }
-                var newDialog = {
-                    userId: d.user_id,
-                    user: {first_name: user.first_name, last_name: user.last_name},
-                    title: d.title,
-                    offset: 0,
-                    frontapp: {
-                        chan_id: app.config.frontapp.channel,
-                        inbox_id: app.config.frontapp.inbox,
-                        token: app.config.frontapp.token,
-                        conversation_reference: ''
-                    }
-                };
-                await(app.dialogsDb.insert(newDialog));
-                dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
-                app.ch.sendToQueue('new_dialog', new Buffer(JSON.stringify({
-                    dialog_id: dialog._id
-                })), {persistent: true});
-            }
-            var messages = await(app.getHistory(d.user_id, dialog.offset));
-            dialog.offset = dialog.offset + messages.length;
-            await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
-            messages
-                .filter(function (m) {
-                    return m.user_id === m.from_id
-                })
-                .forEach(function (message) {
-                    app.ch.publish('messages', app.config.name, new Buffer(JSON.stringify({
-                        message: message,
-                        dialog_id: dialog._id
-                    })))
-                });
-
-        } catch (e) {
-            console.log(e);
+    for(var offset = 0; offset >=0; offset +=limit){
+        var dialogs = await(this.getDialogs(limit, offset));
+        console.log("Dialog: ",dialogs.length);
+        dialogs.forEach(function (d) {
+            await(app.processDialog(d))
+        });
+        if(dialogs.length < limit){
+            break;
         }
-    });
+    }
+
     console.log("Finish loading dialogs " + this.config.name + "..");
     return true;
+});
+
+App.prototype.processDialog = async(function(d){
+    var app = this;
+    try {
+        var dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
+        if (!dialog) {
+            var user = {first_name:d.user_id, last_name: ""};
+            try{
+                user = await(app.getUser(d.user_id));
+            }catch(e){
+                console.error(e);
+            }
+            var newDialog = {
+                userId: d.user_id,
+                user: {first_name: user.first_name, last_name: user.last_name},
+                title: d.title,
+                offset: 0,
+                frontapp: {
+                    chan_id: app.config.frontapp.channel,
+                    inbox_id: app.config.frontapp.inbox,
+                    token: app.config.frontapp.token,
+                    conversation_reference: ''
+                }
+            };
+            await(app.dialogsDb.insert(newDialog));
+            dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
+            app.ch.sendToQueue('new_dialog', new Buffer(JSON.stringify({
+                dialog_id: dialog._id
+            })), {persistent: true});
+        }
+        var messages = await(app.getHistory(d.user_id, dialog.offset));
+        dialog.offset = dialog.offset + messages.length;
+        await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
+        console.log(messages);
+        messages
+            .filter(function (m) {
+                return m.user_id === m.from_id
+            })
+            .forEach(function (message) {
+                app.ch.publish('messages', app.config.name, new Buffer(JSON.stringify({
+                    message: message,
+                    dialog_id: dialog._id
+                })))
+            });
+
+    } catch (e) {
+        console.log(e);
+    }
 });
 
 App.prototype.run = function () {
