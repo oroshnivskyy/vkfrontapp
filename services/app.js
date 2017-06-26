@@ -93,7 +93,7 @@ App.prototype.getUser = async(function (userId, fields) {
     return new Promise(function (resolve, reject) {
         app.serviceVk.request('users.get', params, function (o) {
             if (o.error) {
-                intel.error('Error getting users ',o.error);
+                intel.error('Error getting users %s',o.error);
                 reject(o.error);
                 return;
             }
@@ -111,7 +111,7 @@ App.prototype.sendMessage = async(function (params) {
     return new Promise(function (resolve, reject) {
         app.vk.request('messages.send', params, function (o) {
             if (o.error) {
-                intel.error('Error sendMessage ',o.error);
+                intel.error('Error sendMessage %s',o.error);
                 reject(o.error);
                 return;
             }
@@ -150,7 +150,7 @@ App.prototype.processDialogs = async(function () {
     var app = this;
     for(var offset = 0; offset >=0; offset +=limit){
         var dialogs = await(this.getDialogs(limit, offset));
-        intel.info('Dialog: ', dialogs.length);
+        intel.info('Dialog: %s', dialogs.length);
         dialogs.forEach(function (d) {
             await(app.processDialog(d))
         });
@@ -159,7 +159,7 @@ App.prototype.processDialogs = async(function () {
         }
     }
 
-    intel.info('Finish loading dialogs ', this.config.name);
+    intel.info('Finish loading dialogs %s', this.config.name);
     return true;
 });
 
@@ -172,7 +172,7 @@ App.prototype.processDialog = async(function(d){
             try{
                 user = await(app.getUser(d.user_id));
             }catch(e){
-                intel.error('Err processDialog: ', e);
+                intel.error('Err processDialog: %s', e);
             }
             var newDialog = {
                 userId: d.user_id,
