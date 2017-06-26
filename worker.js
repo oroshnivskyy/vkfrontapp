@@ -10,6 +10,21 @@ var await = require('asyncawait/await');
 var mongo = require('mongodb');
 var ObjectID = mongo.ObjectID;
 var intel = require('intel');
+intel.config({
+    formatters: {
+        'details': {
+            'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
+            'strip': true
+        }
+    },
+    handlers: {
+        'terminal': {
+            'class': intel.handlers.Console,
+            'formatter': 'simple',
+            'level': intel.VERBOSE
+        }
+    }
+});
 
 var mongoPromise = new Promise(function (resolve, reject) {
     var MongoClient = mongo.MongoClient;

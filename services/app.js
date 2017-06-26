@@ -8,6 +8,21 @@ var CRC32 = require('crc-32');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var intel = require('intel');
+intel.config({
+    formatters: {
+        'details': {
+            'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
+            'strip': true
+        }
+    },
+    handlers: {
+        'terminal': {
+            'class': intel.handlers.Console,
+            'formatter': 'simple',
+            'level': intel.VERBOSE
+        }
+    }
+});
 
 function App(config, dialogsDb, ch) {
     this.config = config;
@@ -16,7 +31,7 @@ function App(config, dialogsDb, ch) {
     this.confVk();
 }
 
-App.prototype.confVk = function(){
+App.prototype.confVk = function () {
     var vk = new VK({
         appId: 0,
         language: this.config.vk.lang,
@@ -53,7 +68,7 @@ App.prototype.getDialogs = async(function (limit, offset) {
             var messages = [];
             o.response.items.forEach(function (m) {
                 // if (m.unread > 0) {
-                    messages.push(m.message)
+                messages.push(m.message)
                 // }
             });
             resolve(messages);
@@ -93,7 +108,7 @@ App.prototype.getUser = async(function (userId, fields) {
     return new Promise(function (resolve, reject) {
         app.serviceVk.request('users.get', params, function (o) {
             if (o.error) {
-                intel.error('Error getting users %s',o.error);
+                intel.error('Error getting users %s', o.error);
                 reject(o.error);
                 return;
             }
@@ -111,7 +126,7 @@ App.prototype.sendMessage = async(function (params) {
     return new Promise(function (resolve, reject) {
         app.vk.request('messages.send', params, function (o) {
             if (o.error) {
-                intel.error('Error sendMessage %s',o.error);
+                intel.error('Error sendMessage %s', o.error);
                 reject(o.error);
                 return;
             }
@@ -148,13 +163,13 @@ App.prototype.processDialogs = async(function () {
     this.confVk();
     var limit = 10;
     var app = this;
-    for(var offset = 0; offset >=0; offset +=limit){
+    for (var offset = 0; offset >= 0; offset += limit) {
         var dialogs = await(this.getDialogs(limit, offset));
         intel.info('Dialog: %s', dialogs.length);
         dialogs.forEach(function (d) {
             await(app.processDialog(d))
         });
-        if(dialogs.length < limit){
+        if (dialogs.length < limit) {
             break;
         }
     }
@@ -163,15 +178,15 @@ App.prototype.processDialogs = async(function () {
     return true;
 });
 
-App.prototype.processDialog = async(function(d){
+App.prototype.processDialog = async(function (d) {
     var app = this;
     try {
         var dialog = await(app.dialogsDb.findOne({userId: d.user_id}));
         if (!dialog) {
-            var user = {first_name:d.user_id, last_name: ""};
-            try{
+            var user = {first_name: d.user_id, last_name: ""};
+            try {
                 user = await(app.getUser(d.user_id));
-            }catch(e){
+            } catch (e) {
                 intel.error('Err processDialog: %s', e);
             }
             var newDialog = {
