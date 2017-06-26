@@ -9,6 +9,7 @@ var async = require('asyncawait/async');
 var await = require('asyncawait/await');
 var mongo = require('mongodb');
 var ObjectID = mongo.ObjectID;
+var intel = require('intel');
 
 var mongoPromise = new Promise(function (resolve, reject) {
     var MongoClient = mongo.MongoClient;
@@ -51,14 +52,14 @@ mongoPromise.then(function (mongo) {
 
 function newDialog(ch, dialogsDb) {
     return function (data) {
-        console.log(" [x] Received dialog %s", data.content.toString());
+        intel.info('[x] Received dialog %s', data.content.toString());
         var d = JSON.parse(data.content);
         newChannel(d, dialogsDb)
             .then(function () {
                 ch.ack(data);
             })
             .catch(function (e) {
-                console.error(e);
+                intel.error(e);
                 ch.ack(data);
             });
     }
@@ -77,13 +78,13 @@ var newChannel = async(function (d, dialogsDb) {
 
 function newMessage(ch, dialogsDb) {
     return function (data) {
-        console.log(" [x] Received message %s", data.content.toString());
+        intel.info(" [x] Received message %s", data.content.toString());
         sendMessage(JSON.parse(data.content), dialogsDb)
             .then(function () {
                 ch.ack(data);
             })
             .catch(function (e) {
-                console.error(e);
+                intel.error(e);
                 ch.ack(data);
             });
     }
@@ -108,7 +109,7 @@ var sendMessage = async(function (message, dialogsDb) {
 
     var result = await(frontappRequest(data, path, token));
     if (!dialog.frontapp.conversation_reference || dialog.frontapp.conversation_reference.length === 0) {
-        console.log(result);
+        intel.log(result);
         await(dialogsDb.updateOne({_id: dialog._id}, {'$set': {'frontapp.conversation_reference': 'alt:ref:' + result.conversation_reference}}));
     }
     return result;

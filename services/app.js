@@ -7,6 +7,8 @@ var interval = require('../interval.js');
 var CRC32 = require('crc-32');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+var intel = require('intel');
+
 function App(config, dialogsDb, ch) {
     this.config = config;
     this.dialogsDb = dialogsDb;
@@ -91,7 +93,7 @@ App.prototype.getUser = async(function (userId, fields) {
     return new Promise(function (resolve, reject) {
         app.serviceVk.request('users.get', params, function (o) {
             if (o.error) {
-                console.log(o.error);
+                intel.error('Error getting users ',o.error);
                 reject(o.error);
                 return;
             }
@@ -109,7 +111,7 @@ App.prototype.sendMessage = async(function (params) {
     return new Promise(function (resolve, reject) {
         app.vk.request('messages.send', params, function (o) {
             if (o.error) {
-                console.log(o.error);
+                intel.error('Error sendMessage ',o.error);
                 reject(o.error);
                 return;
             }
@@ -123,7 +125,7 @@ App.prototype.sendMessage = async(function (params) {
 });
 
 App.prototype.sendNewReply = async(function (message) {
-    console.log(message.msg);
+    intel.info(message.msg);
     try {
         if (message.hasAuthor()) {
             var userId = parseInt(message.getRecipient(), 10);
@@ -136,19 +138,19 @@ App.prototype.sendNewReply = async(function (message) {
             return await(this.sendMessage(msg))
         }
     } catch (e) {
-        console.error(e);
+        intel.error('Error sendNewReply ', e);
     }
 
 });
 
 App.prototype.processDialogs = async(function () {
-    console.log("Start loading dialogs for " + this.config.name + "..");
+    intel.info('Start loading dialogs for ', this.config.name);
     this.confVk();
     var limit = 10;
     var app = this;
     for(var offset = 0; offset >=0; offset +=limit){
         var dialogs = await(this.getDialogs(limit, offset));
-        console.log("Dialog: ",dialogs.length);
+        intel.info('Dialog: ', dialogs.length);
         dialogs.forEach(function (d) {
             await(app.processDialog(d))
         });
@@ -157,7 +159,7 @@ App.prototype.processDialogs = async(function () {
         }
     }
 
-    console.log("Finish loading dialogs " + this.config.name + "..");
+    intel.info('Finish loading dialogs ', this.config.name);
     return true;
 });
 
@@ -170,7 +172,7 @@ App.prototype.processDialog = async(function(d){
             try{
                 user = await(app.getUser(d.user_id));
             }catch(e){
-                console.error(e);
+                intel.error('Err processDialog: ', e);
             }
             var newDialog = {
                 userId: d.user_id,
@@ -193,7 +195,7 @@ App.prototype.processDialog = async(function(d){
         var messages = await(app.getHistory(d.user_id, dialog.offset));
         dialog.offset = dialog.offset + messages.length;
         await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
-        console.log(messages);
+        intel.info(messages);
         messages
             .filter(function (m) {
                 return m.user_id === m.from_id
@@ -206,7 +208,7 @@ App.prototype.processDialog = async(function(d){
             });
 
     } catch (e) {
-        console.log(e);
+        intel.error(e);
     }
 });
 
