@@ -11,21 +11,25 @@ function App(config, dialogsDb, ch) {
     this.config = config;
     this.dialogsDb = dialogsDb;
     this.ch = ch;
+    this.confVk();
+}
+
+App.prototype.confVk = function(){
     var vk = new VK({
         appId: 0,
-        language: config.vk.lang,
+        language: this.config.vk.lang,
         secure: true
     });
     vk.setSecureRequests(true);
-    vk.setToken(config.vk.api_key);
+    vk.setToken(this.config.vk.api_key);
     this.vk = vk;
     this.serviceVk = new VK({
         appId: 0,
-        language: config.vk.lang,
+        language: this.config.vk.lang,
         secure: true
     });
     this.serviceVk.setSecureRequests(true);
-}
+};
 
 App.prototype.getClient = function () {
     return this.vk;
@@ -139,6 +143,7 @@ App.prototype.sendNewReply = async(function (message) {
 
 App.prototype.processDialogs = async(function () {
     console.log("Start loading dialogs for " + this.config.name + "..");
+    this.confVk();
     var limit = 10;
     var app = this;
     for(var offset = 0; offset >=0; offset +=limit){
