@@ -8,28 +8,9 @@ var CRC32 = require('crc-32');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var intel = require('intel');
-intel.config({
-    formatters: {
-        'details': {
-            'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
-            'strip': true
-        }
-    },
-    handlers: {
-        'terminal': {
-            'class': intel.handlers.Console,
-            'formatter': 'simple',
-            'level': intel.VERBOSE
-        }
-    },
-    loggers: {
-        'patrol': {
-            'handlers': ['terminal'],
-            'level': 'INFO',
-            'handleExceptions': true,
-            'exitOnError': false,
-            'propagate': false
-        }}
+intel.setFormatter({
+    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
+    'strip': true
 });
 
 function App(config, dialogsDb, ch) {

@@ -10,28 +10,9 @@ var await = require('asyncawait/await');
 var mongo = require('mongodb');
 var ObjectID = mongo.ObjectID;
 var intel = require('intel');
-intel.config({
-    formatters: {
-        'details': {
-            'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
-            'strip': true
-        }
-    },
-    handlers: {
-        'terminal': {
-            'class': intel.handlers.Console,
-            'formatter': 'details',
-            'level': intel.VERBOSE
-        }
-    },
-    loggers: {
-        'patrol': {
-            'handlers': ['terminal'],
-            'level': 'INFO',
-            'handleExceptions': true,
-            'exitOnError': false,
-            'propagate': false
-        }}
+intel.setFormatter({
+    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
+    'strip': true
 });
 
 var mongoPromise = new Promise(function (resolve, reject) {
