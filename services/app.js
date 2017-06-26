@@ -125,7 +125,7 @@ App.prototype.sendMessage = async(function (params) {
 });
 
 App.prototype.sendNewReply = async(function (message) {
-    intel.info(message.msg);
+    intel.info(JSON.stringify(message.msg));
     try {
         if (message.hasAuthor()) {
             var userId = parseInt(message.getRecipient(), 10);
@@ -144,7 +144,7 @@ App.prototype.sendNewReply = async(function (message) {
 });
 
 App.prototype.processDialogs = async(function () {
-    intel.info('Start loading dialogs for ', this.config.name);
+    intel.info('Start loading dialogs for ', JSON.stringify(this.config.name));
     this.confVk();
     var limit = 10;
     var app = this;
@@ -159,7 +159,7 @@ App.prototype.processDialogs = async(function () {
         }
     }
 
-    intel.info('Finish loading dialogs %s', this.config.name);
+    intel.info('Finish loading dialogs %s', JSON.stringify(this.config.name));
     return true;
 });
 
@@ -195,7 +195,7 @@ App.prototype.processDialog = async(function(d){
         var messages = await(app.getHistory(d.user_id, dialog.offset));
         dialog.offset = dialog.offset + messages.length;
         await(app.dialogsDb.updateOne({_id: dialog._id}, dialog));
-        intel.info(messages);
+        intel.info('%s', JSON.stringify(messages));
         messages
             .filter(function (m) {
                 return m.user_id === m.from_id

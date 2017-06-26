@@ -52,7 +52,7 @@ mongoPromise.then(function (mongo) {
 
 function newDialog(ch, dialogsDb) {
     return function (data) {
-        intel.info('[x] Received dialog %s', data.content.toString());
+        intel.info('[x] Received dialog %s', JSON.stringify(data.content.toString()));
         var d = JSON.parse(data.content);
         newChannel(d, dialogsDb)
             .then(function () {
@@ -78,7 +78,7 @@ var newChannel = async(function (d, dialogsDb) {
 
 function newMessage(ch, dialogsDb) {
     return function (data) {
-        intel.info(" [x] Received message %s", data.content.toString());
+        intel.info(" [x] Received message %s", JSON.stringify(data.content.toString()));
         sendMessage(JSON.parse(data.content), dialogsDb)
             .then(function () {
                 ch.ack(data);
