@@ -8,9 +8,8 @@ var CRC32 = require('crc-32');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var intel = require('intel');
-intel.setFormatter({
-    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
-    'strip': true
+intel.basicConfig({
+    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s' 
 });
 
 function App(config, dialogsDb, ch) {

@@ -10,9 +10,8 @@ var await = require('asyncawait/await');
 var mongo = require('mongodb');
 var ObjectID = mongo.ObjectID;
 var intel = require('intel');
-intel.setFormatter({
-    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s',
-    'strip': true
+intel.basicConfig({
+    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s'
 });
 
 var mongoPromise = new Promise(function (resolve, reject) {
