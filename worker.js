@@ -20,10 +20,18 @@ intel.config({
     handlers: {
         'terminal': {
             'class': intel.handlers.Console,
-            'formatter': 'simple',
+            'formatter': 'details',
             'level': intel.VERBOSE
         }
-    }
+    },
+    loggers: {
+        'patrol': {
+            'handlers': ['terminal'],
+            'level': 'INFO',
+            'handleExceptions': true,
+            'exitOnError': false,
+            'propagate': false
+        }}
 });
 
 var mongoPromise = new Promise(function (resolve, reject) {

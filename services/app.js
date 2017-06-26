@@ -21,7 +21,15 @@ intel.config({
             'formatter': 'simple',
             'level': intel.VERBOSE
         }
-    }
+    },
+    loggers: {
+        'patrol': {
+            'handlers': ['terminal'],
+            'level': 'INFO',
+            'handleExceptions': true,
+            'exitOnError': false,
+            'propagate': false
+        }}
 });
 
 function App(config, dialogsDb, ch) {
