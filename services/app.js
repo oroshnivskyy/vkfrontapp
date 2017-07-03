@@ -9,7 +9,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 var intel = require('intel');
 intel.basicConfig({
-    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s' 
+    'format': '[%(date)s] %(name)s.%(levelname)s: %(message)s'
 });
 
 function App(config, dialogsDb, ch) {
@@ -151,15 +151,19 @@ App.prototype.processDialogs = async(function () {
     this.confVk();
     var limit = 10;
     var app = this;
-    for (var offset = 0; offset >= 0; offset += limit) {
-        var dialogs = await(this.getDialogs(limit, offset));
-        intel.info('Dialog: %s', dialogs.length);
-        dialogs.forEach(function (d) {
-            await(app.processDialog(d))
-        });
-        if (dialogs.length < limit) {
-            break;
+    try {
+        for (var offset = 0; offset >= 0; offset += limit) {
+            var dialogs = await(this.getDialogs(limit, offset));
+            intel.info('Dialog: %s', dialogs.length);
+            dialogs.forEach(function (d) {
+                await(app.processDialog(d))
+            });
+            if (dialogs.length < limit) {
+                break;
+            }
         }
+    } catch (e) {
+        intel.eror('Error loading dialogs: %s', e);
     }
 
     intel.info('Finish loading dialogs %s', JSON.stringify(this.config.name));
